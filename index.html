@@ -2,19 +2,310 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <title>Zitago</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="robots" content="noindex">
-  <link rel="canonical" href="https://app.zitago.es/">
-  <!-- Fallback when JavaScript is off: lands on the home page. -->
-  <meta http-equiv="refresh" content="0; url=https://app.zitago.es/">
-  <script>
-    // Keep the path (zitago.es/privacidad -> app.zitago.es/privacidad).
-    // The origin is fixed, so the URL can't send the visitor anywhere else.
-    location.replace('https://app.zitago.es' + location.pathname + location.search + location.hash);
-  </script>
+  <!-- No scripts, no third parties: fonts and images come from this site only. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; font-src 'self'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+  <title>ZitaGo · Reserva cita en peluquerías, barberías y spas</title>
+  <meta name="description" content="Busca la próxima hora libre de peluquerías, barberías, centros de uñas, estética y spas, y reserva al momento sin llamar.">
+  <link rel="canonical" href="https://zitago.es/">
+  <meta name="theme-color" content="#F7F3EE">
+  <meta name="color-scheme" content="light">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon.png" type="image/png" sizes="48x48">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_ES">
+  <meta property="og:site_name" content="ZitaGo">
+  <meta property="og:url" content="https://zitago.es/">
+  <meta property="og:title" content="ZitaGo · Reserva cita en peluquerías, barberías y spas">
+  <meta property="og:description" content="Busca la próxima hora libre de cada negocio y reserva al momento, sin llamar.">
+  <meta property="og:image" content="https://zitago.es/og-image.png">
+  <meta property="og:image:width" content="1024">
+  <meta property="og:image:height" content="500">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preload" href="fonts/inter-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin>
+  <style>
+    /* Inter, subset to Latin (fonts/OFL.txt). Same tokens as mobile/src/theme.ts. */
+    @font-face { font-family: Inter; src: url(fonts/inter-400.woff2) format("woff2"); font-weight: 400; font-display: swap; }
+    @font-face { font-family: Inter; src: url(fonts/inter-600.woff2) format("woff2"); font-weight: 600; font-display: swap; }
+    @font-face { font-family: Inter; src: url(fonts/inter-700.woff2) format("woff2"); font-weight: 700; font-display: swap; }
+
+    :root {
+      --cream: #F7F3EE;
+      --ink: #1C1719;
+      --ink-raised: #3A3236;
+      --muted: #6B6166;
+      --surface: #FFFFFF;
+      --surface-alt: #EFEAE4;
+      --border: #E6DED5;
+      --accent: #C81871;
+      --black: #000000;
+      --night-card: #171315;
+      --night-line: #2C2629;
+      --night-muted: #B5ACB0;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--ink);
+      font: 400 16px/1.55 Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: clip;
+    }
+    a { color: inherit; }
+    a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; border-radius: 6px; }
+    img, svg { display: block; }
+    .wrap { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+
+    /* Header */
+    .top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 20px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 700; font-size: 21px; letter-spacing: -0.02em; }
+    .brand img { width: 36px; height: 36px; border-radius: 10px; }
+    .top nav { display: flex; align-items: center; gap: 24px; }
+    .nav-link { display: none; font-weight: 600; font-size: 15px; color: var(--muted); text-decoration: none; }
+    .nav-link:hover { color: var(--ink); }
+    @media (min-width: 640px) { .nav-link { display: inline; } }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 50px; padding: 0 24px; border-radius: 999px;
+      font-weight: 600; font-size: 16px; text-decoration: none; white-space: nowrap;
+      transition: background-color .15s, border-color .15s;
+    }
+    .btn-small { min-height: 42px; padding: 0 18px; font-size: 15px; }
+    .btn-dark { background: var(--ink); color: #fff; }
+    .btn-dark:hover { background: var(--ink-raised); }
+    .btn-line { border: 1px solid #D6CCC2; color: var(--ink); }
+    .btn-line:hover { background: var(--surface-alt); }
+    .btn-light { background: var(--cream); color: var(--black); }
+    .btn-light:hover { background: #fff; }
+
+    /* Hero */
+    .hero { display: grid; gap: 56px; padding-block: 36px 80px; }
+    @media (min-width: 920px) {
+      .hero { grid-template-columns: 1.15fr .85fr; align-items: center; gap: 64px; padding-block: 64px 112px; }
+    }
+    .kicker { margin: 0 0 16px; font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+    h1 {
+      margin: 0 0 20px; font-weight: 700;
+      font-size: clamp(38px, 7.2vw, 62px); line-height: 1.03; letter-spacing: -0.035em;
+      text-wrap: balance;
+    }
+    .lead { margin: 0 0 32px; max-width: 32em; font-size: clamp(17px, 2.1vw, 19px); color: var(--muted); }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .fine { margin: 24px 0 0; font-size: 14px; color: var(--muted); }
+
+    /* The booking card: an illustration of the app, not a real business. */
+    .demo { position: relative; width: 100%; max-width: 380px; justify-self: center; margin-bottom: 28px; }
+    .card {
+      overflow: hidden; background: var(--surface); border: 1px solid var(--border); border-radius: 24px;
+      box-shadow: 0 1px 0 rgba(28, 23, 25, .04), 0 30px 60px -30px rgba(28, 23, 25, .35);
+    }
+    .cover { display: flex; align-items: flex-start; height: 92px; padding: 16px; background: #F5EADB; }
+    .chip { padding: 5px 12px; border-radius: 999px; background: rgba(255, 255, 255, .75); color: #7E5219; font-weight: 600; font-size: 13px; }
+    .card-body { padding: 20px 20px 22px; }
+    .service { margin: 0; font-weight: 600; font-size: 19px; letter-spacing: -0.01em; }
+    .meta { margin: 2px 0 20px; font-size: 14px; color: var(--muted); }
+    .day { margin: 0 0 10px; font-size: 12px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+    .slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 18px; }
+    .slot {
+      padding: 10px 0; border: 1px solid var(--border); border-radius: 12px; text-align: center;
+      font-weight: 600; font-size: 16px; font-variant-numeric: tabular-nums;
+    }
+    .slot.is-chosen { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .book { padding: 14px; border-radius: 14px; background: var(--ink); color: #fff; text-align: center; font-weight: 600; }
+    .toast {
+      position: absolute; left: 16px; bottom: -28px;
+      display: flex; align-items: center; gap: 12px; padding: 12px 18px 12px 12px;
+      border-radius: 16px; background: var(--black); color: var(--cream);
+      box-shadow: 0 18px 36px -18px rgba(0, 0, 0, .55);
+    }
+    @media (min-width: 920px) { .toast { left: -36px; } }
+    .toast strong { display: block; font-weight: 600; font-size: 14px; line-height: 1.3; }
+    .toast span { display: block; font-size: 13px; line-height: 1.3; color: var(--night-muted); font-variant-numeric: tabular-nums; }
+    .tick { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: #1F5C40; }
+
+    /* Sections */
+    .section { padding: 80px 0; }
+    @media (min-width: 920px) { .section { padding: 112px 0; } }
+    .section.after-hero { padding-top: 0; }
+    h2 {
+      margin: 0 0 16px; font-weight: 700;
+      font-size: clamp(30px, 4.6vw, 44px); line-height: 1.08; letter-spacing: -0.03em;
+      text-wrap: balance;
+    }
+    .section-lead { margin: 0 0 44px; max-width: 34em; font-size: 18px; color: var(--muted); }
+    .features { display: grid; gap: 16px; margin: 0; padding: 0; list-style: none; }
+    @media (min-width: 640px) { .features { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 1000px) { .features-4 { grid-template-columns: repeat(4, 1fr); } }
+    .feature { padding: 24px; border: 1px solid var(--border); border-radius: 20px; background: var(--surface); }
+    .feature h3 { margin: 18px 0 8px; font-weight: 600; font-size: 17px; line-height: 1.3; letter-spacing: -0.01em; }
+    .feature p { margin: 0; font-size: 15px; color: var(--muted); }
+    .icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 13px; background: var(--surface-alt); }
+    .icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* For businesses: black, like the logo. */
+    .night { background: var(--black); color: var(--cream); }
+    .night .kicker, .night .section-lead { color: var(--night-muted); }
+    .night .feature { background: var(--night-card); border-color: var(--night-line); }
+    .night .feature p { color: var(--night-muted); }
+    .night .icon { background: var(--night-line); }
+    .reviewed { display: flex; align-items: center; gap: 10px; margin: 32px 0 0; font-size: 15px; color: var(--night-muted); }
+    .reviewed svg { flex: none; width: 20px; height: 20px; fill: none; stroke: var(--cream); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .night-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; margin-top: 40px; }
+    .night-cta p { margin: 0; font-size: 15px; color: var(--night-muted); }
+    .night-cta p a { color: var(--cream); font-weight: 600; }
+
+    /* Footer */
+    .foot { display: grid; gap: 28px; padding: 48px 0 56px; }
+    @media (min-width: 760px) { .foot { grid-template-columns: 1fr auto; align-items: start; } }
+    .foot p { margin: 10px 0 0; max-width: 28em; font-size: 14px; color: var(--muted); }
+    .foot ul { display: flex; flex-wrap: wrap; gap: 10px 24px; margin: 0; padding: 0; list-style: none; }
+    .foot li a { font-size: 15px; font-weight: 600; color: var(--muted); text-decoration: none; }
+    .foot li a:hover { color: var(--ink); }
+    .copy { padding-bottom: 32px; font-size: 13px; color: var(--muted); }
+  </style>
 </head>
 <body>
-  <p><a href="https://app.zitago.es/">Ir a Zitago</a></p>
+  <header class="wrap top">
+    <a class="brand" href="/" aria-label="ZitaGo, inicio">
+      <img src="favicon.svg" alt="" width="36" height="36">
+      <span>ZitaGo</span>
+    </a>
+    <nav aria-label="Principal">
+      <a class="nav-link" href="#negocios">Para negocios</a>
+      <a class="btn btn-dark btn-small" href="https://app.zitago.es/">Abrir ZitaGo</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="wrap hero" aria-labelledby="hero-title">
+      <div>
+        <p class="kicker">Peluquería · Barbería · Uñas · Estética · Spa</p>
+        <h1 id="hero-title">Busca la próxima hora libre y reserva al momento.</h1>
+        <p class="lead">ZitaGo te enseña cuándo puede atenderte cada negocio y te deja reservar en segundos, sin llamar y sin esperar a que te contesten. El servicio se paga en el negocio, como siempre.</p>
+        <div class="actions">
+          <a class="btn btn-dark" href="https://app.zitago.es/">Buscar cita</a>
+          <a class="btn btn-line" href="#negocios">Tengo un negocio</a>
+        </div>
+        <p class="fine">Funciona en el navegador del móvil y del ordenador. Las apps para Android e iPhone están en pruebas.</p>
+      </div>
+
+      <div class="demo" role="img" aria-label="Ejemplo de reserva en ZitaGo: eliges una hora libre de hoy y la reserva queda confirmada.">
+        <div class="card">
+          <div class="cover"><span class="chip">Peluquería</span></div>
+          <div class="card-body">
+            <p class="service">Corte y peinado</p>
+            <p class="meta">45 min · cualquier profesional</p>
+            <p class="day">Hoy</p>
+            <div class="slots">
+              <span class="slot is-chosen">17:30</span>
+              <span class="slot">18:15</span>
+              <span class="slot">19:00</span>
+              <span class="slot">19:45</span>
+            </div>
+            <div class="book">Reservar a las 17:30</div>
+          </div>
+        </div>
+        <div class="toast">
+          <span class="tick"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+          <div><strong>Reserva confirmada</strong><span>Hoy a las 17:30</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section after-hero" aria-labelledby="clients-title">
+      <div class="wrap">
+        <p class="kicker">Para clientes</p>
+        <h2 id="clients-title">Reservar, sin llamar.</h2>
+        <p class="section-lead">A cualquier hora del día, también cuando el negocio está cerrado o con las manos ocupadas.</p>
+        <ul class="features features-4">
+          <li class="feature">
+            <span class="icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <h3>La próxima hora libre, a la vista</h3>
+            <p>Cada negocio te dice cuándo puede atenderte antes de que entres en su ficha.</p>
+          </li>
+          <li class="feature">
+            <span class="icon"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4M9 15.2l2 2 4-4"/></svg></span>
+            <h3>Solo huecos de verdad</h3>
+            <p>Eliges profesional, día y hora entre los que están libres en ese momento.</p>
+          </li>
+          <li class="feature">
+            <span class="icon"><svg viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 1 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></svg></span>
+            <h3>Confirmación y recordatorio</h3>
+            <p>Te avisamos al reservar y otra vez antes de la cita.</p>
+          </li>
+          <li class="feature">
+            <span class="icon"><svg viewBox="0 0 24 24"><rect x="4.5" y="3" width="15" height="18" rx="3"/><path d="M8.5 8h7M8.5 12h7M8.5 16h4"/></svg></span>
+            <h3>Tus citas, en un sitio</h3>
+            <p>En «Mis reservas» las tienes todas, y puedes cancelarlas desde ahí si cambias de planes.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section night" id="negocios" aria-labelledby="business-title">
+      <div class="wrap">
+        <p class="kicker">Para negocios</p>
+        <h2 id="business-title">Tu agenda, siempre en orden.</h2>
+        <p class="section-lead">Pon tus servicios, tu equipo y tus horarios. ZitaGo solo ofrece a tus clientes las horas que de verdad puedes atender.</p>
+        <ul class="features">
+          <li class="feature">
+            <span class="icon"><svg viewBox="0 0 24 24"><path d="M12 3l7.5 3v6c0 4.4-3.2 8-7.5 9-4.3-1-7.5-4.6-7.5-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span>
+            <h3>Sin solapes</h3>
+            <p>Dos clientes nunca pueden reservar a la misma persona a la misma hora.</p>
+          </li>
+          <li class="feature">
+            <span class="icon"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4M10 13.5l4 4M14 13.5l-4 4"/></svg></span>
+            <h3>Horarios a tu medida</h3>
+            <p>Descansos, vacaciones y días cerrados: lo que cierras no se puede reservar.</p>
+          </li>
+          <li class="feature">
+            <span class="icon"><svg viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 1 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></svg></span>
+            <h3>Avisos al momento</h3>
+            <p>Cada reserva nueva o cancelación te llega enseguida, con el teléfono del cliente a un toque.</p>
+          </li>
+          <li class="feature">
+            <span class="icon"><svg viewBox="0 0 24 24"><path d="M4 9.5L5.5 4h13L20 9.5"/><path d="M5 11.5V20h14v-8.5"/><path d="M4 9.5a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0"/><path d="M10 20v-4.5h4V20"/></svg></span>
+            <h3>Más de un local</h3>
+            <p>Hasta 5 negocios con la misma cuenta, cada uno con su equipo y su agenda.</p>
+          </li>
+        </ul>
+        <p class="reviewed"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.2l2.8 2.8L16 9.8"/></svg>Revisamos cada negocio antes de que aparezca en ZitaGo.</p>
+        <div class="night-cta">
+          <a class="btn btn-light" href="https://app.zitago.es/register?role=PROVIDER">Dar de alta mi negocio</a>
+          <p>¿Prefieres que te lo enseñemos? <a href="mailto:hola@zitago.es">Escríbenos a hola@zitago.es</a></p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap">
+    <div class="foot">
+      <div>
+        <a class="brand" href="/" aria-label="ZitaGo, inicio">
+          <img src="favicon.svg" alt="" width="36" height="36">
+          <span>ZitaGo</span>
+        </a>
+        <p>Reserva cita en peluquerías, barberías, centros de uñas, estética y spas de España.</p>
+      </div>
+      <nav aria-label="Información legal y contacto">
+        <ul>
+          <li><a href="https://app.zitago.es/privacidad">Privacidad</a></li>
+          <li><a href="https://app.zitago.es/condiciones">Condiciones</a></li>
+          <li><a href="https://app.zitago.es/aviso-legal">Aviso legal</a></li>
+          <li><a href="https://app.zitago.es/delete-account">Eliminar cuenta</a></li>
+          <li><a href="mailto:hola@zitago.es">hola@zitago.es</a></li>
+        </ul>
+      </nav>
+    </div>
+    <p class="copy">© 2026 ZitaGo</p>
+  </footer>
 </body>
 </html>
