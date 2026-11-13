@@ -3,7 +3,7 @@
 The site at `zitago.es` and `www.zitago.es`, served by GitHub Pages, which gives
 the custom domain a free HTTPS certificate. GitHub sends `www` to `zitago.es`.
 
-- `index.html` is a static landing page: what ZitaGo is, a button to the app and
+- `index.html` is a static landing page: what ZitaGO is, a button to the app and
   links to the privacy policy, the terms and the legal notice. It is the brand's
   home page in Google Auth Platform, which needs a page it can read without
   JavaScript (`app.zitago.es` is a single-page app). No scripts, no cookies, no
